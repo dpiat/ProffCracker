@@ -1,0 +1,4 @@
+
+*.xml
+.idea/RankingOfProfessions-HACK.iml
+__pycache__/algorithm.cpython-36.pyc
