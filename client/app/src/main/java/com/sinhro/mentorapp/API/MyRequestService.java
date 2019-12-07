@@ -10,6 +10,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinhro.mentorapp.Model.EventsList;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class MyRequestService {
@@ -84,19 +84,26 @@ public class MyRequestService {
 
     private ProfessionsList deserialize(String json){
         ProfessionsList professionsList = new ProfessionsList(new ArrayList<>());
+        professionsList = getProfessions("123321");
         ObjectMapper objectMapper = new ObjectMapper().configure(
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false
         );
         try {
-            List<Profession> profs = new ArrayList<>();
-            HashMap<Integer,Profession> map;
-            map = ((HashMap<Integer,Profession>) objectMapper.readValue(json, HashMap.class));
+            int i = json.indexOf("{\"0\"");
+            json = json.substring(i);
+            json = json.concat("}");
 
-            Set set = map.entrySet();
-            for (Object en : set) {
-                Profession prof = ((Profession) en);
-                profs.add(prof);
-            }
+            TypeReference<HashMap<Integer,Profession>> typeRef =
+                    new TypeReference<HashMap<Integer, Profession>>() {};
+            List<Profession> profs = new ArrayList<>();
+            HashMap<Integer,Profession> map =
+                    ((HashMap<Integer,Profession>) objectMapper.readValue(json, typeRef));
+
+//            Set set = map.entrySet();
+//            for (Object en : set) {
+//                Profession prof = ((Profession) en);
+//                profs.add(prof);
+//            }
 
 
 
@@ -108,7 +115,7 @@ public class MyRequestService {
 //                }
 //            });
             professionsList = new ProfessionsList(new ArrayList<>(map.values()));
-            professionsList = new ProfessionsList(profs);
+//            professionsList = new ProfessionsList(profs);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
